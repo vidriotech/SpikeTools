@@ -1,19 +1,20 @@
 module SpikeTools
 
 export Annotations
-export ProbeTools
+export Datasets
 
-include("probetools.jl")
+include("datasets.jl")
 include("annotations.jl")
 
-import .Annotations: clusters, nclusters, nspikes, probe, spikeclusters, spiketimes
+import .Datasets: Probe, channelmap, channelpositions, probefromphy, modelname, nchannels
+export Probe, channelmap, channelpositions, probefromphy, modelname, nchannels
+
+import .Annotations: clusters, clustertimes, nclusters, nspikes, probe, spikeclusters,
+                     spikecounts, spiketimes
 import .Annotations: KilosortAnnotation, loadkilosort, amplitudes, similartemplates,
                      spiketemplates, templates
-export clusters, nclusters, nspikes, probe, spikeclusters, spiketimes
+export clusters, clustertimes, nclusters, nspikes, probe, spikeclusters, spiketimes
 export KilosortAnnotation, loadkilosort, amplitudes, similartemplates,
        spiketemplates, templates
-
-import .ProbeTools: Probe
-export Probe
 
 end # module

@@ -26,7 +26,7 @@ function loadkilosort(dir::String)
         end
     end
 
-    probe = fromphy(joinpath(dir, "channel_map.npy"), joinpath(dir, "channel_positions.npy"))
+    probe = probefromphy(joinpath(dir, "channel_map.npy"), joinpath(dir, "channel_positions.npy"))
 
     amplitudes = npzread(joinpath(dir, "amplitudes.npy"))[:]
     similartemplates = npzread(joinpath(dir, "similar_templates.npy"))

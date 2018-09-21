@@ -1,10 +1,11 @@
 module Annotations
 
 import NPZ: npzread
-import ..ProbeTools: Probe, fromphy, channelmap
+import ..Datasets: Probe, probefromphy, channelmap
 
 # generic annotation
-export clusters, nclusters, nspikes, probe, spikeclusters, spiketimes
+export Annotation, clusters, clustertimes, nclusters, nspikes, probe,
+       spikeclusters, spikecounts, spiketimes
 # kilosort annotation
 export KilosortAnnotation, loadkilosort, amplitudes, similartemplates,
        spiketemplates, templates

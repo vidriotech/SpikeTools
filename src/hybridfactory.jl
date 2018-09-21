@@ -1,6 +1,6 @@
 module HybridFactory
 
 import ..Annotations
-import ..ProbeTools
+import ..Datasets
 
 end # module
