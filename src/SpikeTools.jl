@@ -6,8 +6,10 @@ export Datasets
 include("datasets.jl")
 include("annotations.jl")
 
-import .Datasets: Probe, channelmap, channelpositions, probefromphy, modelname, nchannels
-export Probe, channelmap, channelpositions, probefromphy, modelname, nchannels
+import .Datasets: Probe, probefromphy, probefromspikeglx, channelmap, channelpositions, modelname, nchannels
+import .Datasets: readspikeglxmeta, recfromspikeglx
+export Probe, probefromphy, probefromspikeglx, channelmap, channelpositions, modelname, nchannels
+export readspikeglxmeta, recfromspikeglx
 
 import .Annotations: clusters, clustertimes, nclusters, nspikes, probe, spikeclusters,
                      spikecounts, spiketimes

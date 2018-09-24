@@ -2,7 +2,8 @@ module Datasets
 
 import NPZ: npzread
 
-export Probe, probefromphy, channelmap, channelpositions, nchannels
+export Probe, probefromphy, probefromspikeglx, channelmap, channelpositions, nchannels
+export readspikeglxmeta, recfromspikeglx
 
 include("datasets/probe.jl")
 include("datasets/recording.jl")
