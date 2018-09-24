@@ -1,17 +1,17 @@
 struct Probe
-    channelmap::Array{Integer, 1}
-    channelpositions::Array{Real, 2}
+    channelmap::Array{<:Integer, 1}
+    channelpositions::Array{<:Real, 2}
     modelname::String
     nchannels::Integer
-end
 
-function Probe(channelmap::Array{Integer, 1}, channelpositions::Array{Real, 2},
-               modelname::String, nchannels::Integer)
-    nmapchans = length(channelmap)
-    if nmapchans == size(channelpositions, 1) && nmapchans ≤ nchannels
-        new(channelmap, channelpositions, nchannels)
-    else
-        error("misshapen probe")
+    function Probe(channelmap::Array{<:Integer, 1}, channelpositions::Array{<:Real, 2},
+                   modelname::String, nchannels::Integer)
+        nmapchans = length(channelmap)
+        if nmapchans == size(channelpositions, 1) && nmapchans ≤ nchannels
+            new(channelmap, channelpositions, modelname, nchannels)
+        else
+            error("misshapen probe")
+        end
     end
 end
 
