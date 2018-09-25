@@ -15,6 +15,15 @@ struct Probe
     end
 end
 
+function probefromjrclust(matfile::String, modelname::String="", nchannels::Integer=0)
+    channelmap = Array{UInt64}(readmatshim(matfile, "P/viSite2Chan"))
+    channelpositions = readmatshim(matfile, "P/mrSiteXY", false)
+
+    # by default, assume nchannels is largest channel in channel map
+    nchannels = nchannels > 0 ? nchannels : maximum(channelmap)
+    Probe(channelmap, channelpositions, modelname, nchannels)
+end
+
 function probefromphy(chanmapfile::String, chanposfile::String, modelname::String="", nchannels::Integer=0)
     channelmap = npzread(chanmapfile)[:] .+ 1
     channelpositions = npzread(chanposfile)
@@ -22,6 +31,14 @@ function probefromphy(chanmapfile::String, chanposfile::String, modelname::Strin
     # by default, assume nchannels is largest channel in channel map
     nchannels = nchannels > 0 ? nchannels : maximum(channelmap)
 
+    Probe(channelmap, channelpositions, modelname, nchannels)
+end
+
+function probefromrezfile(matfile::String, modelname::String="")
+    channelmap = Array{UInt64}(readmatshim(matfile, "rez/ops/chanMap"))
+    channelpositions = [readmatshim(matfile, "rez/xcoords") readmatshim(matfile, "rez/ycoords")]
+    nchannels = UInt64(mattoscalar(matfile, "rez/ops/NchanTOT"))
+    connected = indexin(1:nchannels, channelmap) .≠ nothing
     Probe(channelmap, channelpositions, modelname, nchannels)
 end
 
