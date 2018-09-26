@@ -5,18 +5,18 @@ import NPZ: npzread
 export Probe, probefromjrclust, probefromphy, probefromrezfile, probefromspikeglx,
        channelmap, channelpositions, modelname, nchannels
 export Recording, recordingfromspikeglx, recordingfromrezfile, binarypath, fsizebytes,
-       nstoredchannels, probe, recordedby, recordedon, samplerate
+       nstoredchannels, recordedby, recordedon, samplerate
 export Trial, trialfromspikeglx, trialfromrezfile, runtimesecs, starttimesecs
-export Dataset, datasetfromspikeglx, recordings, trials
+export Dataset, datasetfromjrclust, datasetfromrezfile, datasetfromspikeglx, probe, recordings, trials
 # generic annotation
-export Annotation, clusters, clustertimes, nclusters, nspikes, spikeclusters,
+export Annotation, clusters, clustertimes, dataset, nclusters, nspikes, spikeclusters,
        spikecounts, spiketimes
 # jrclust annotation
 export JRCLUSTAnnotation, jrclustfrommat
 # kilosort/template annotation
 export TemplateAnnotation, KilosortAnnotation, kilosortfromphy, kilosortfromrezfile,
        amplitudes, similartemplates, spiketemplates, templates
-export Sorting, sortingfromjrclust, sortingfromrezfile, autoannotation, dataset,
+export Sorting, sortingfromjrclust, sortingfromrezfile, autoannotation,
        programused, programversion, runtimesecs, sortedby, sortedon
 
 include("datasets/utils.jl")

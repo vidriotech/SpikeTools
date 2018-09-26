@@ -2,13 +2,13 @@ using Dates
 using Glob
 
 mutable struct Recording
-    binarypath::String      # path to recording file
-    datatype::DataType      # data type of stored data
-    fsizebytes::UInt64      # size of the file, in bytes
-    nstoredchannels::UInt64 # number of stored channels in file
-    recordedby::String      # who recorded this data set
-    recordedon::Date        # date on which this file was created
-    samplerate::UInt64      # sample rate of the recording, in Hz
+    binarypath::String        # path to recording file
+    datatype::DataType        # data type of stored data
+    fsizebytes::Unsigned      # size of the file, in bytes
+    nstoredchannels::Unsigned # number of stored channels in file
+    recordedby::String        # who recorded this data set
+    recordedon::Date          # date on which this file was created
+    samplerate::Unsigned      # sample rate of the recording, in Hz
 end
 
 """
@@ -42,12 +42,31 @@ function readspikeglxmeta(filename::String)
     vals
 end
 
+function recordingfromphy(params::Dict{String}; recordedby::String="")
+    binarypath = params["dat_path"]
+    fsizebytes = filesize(binarypath)
+    nstoredchannels = parse(UInt64, params["n_channels_dat"])
+    recordedon = Date(unix2datetime(mtime(binarypath)))
+    samplerate = parse(UInt64, replace(params["sample_rate"], r"\." => ""))
+
+    Recording(binarypath, Int16, fsizebytes, nstoredchannels, recordedby,
+              recordedon, samplerate)
+end
+
+function recordingfromphy(paramfile::String)
+    params = open(paramfile, "r") do fh
+        Dict{String, String}([split(l, r"\s*=\s*") for l in readlines(fh)]) # broadcasting fails here
+    end
+
+    recordingfromphy(params)
+end
+
 function recordingfromrezfile(matfile::String; recordedby::String="")
     binarypath = mattostring(matfile, "rez/ops/fbinary")
     fsizebytes = filesize(binarypath)
-    nstoredchannels = UInt64(mattoscalar(matfile, "rez/ops/NchanTOT"))
+    nstoredchannels = UInt(mattoscalar(matfile, "rez/ops/NchanTOT"))
     recordedon = Date(unix2datetime(mtime(binarypath)))
-    samplerate = UInt64(mattoscalar(matfile, "rez/ops/fs"))
+    samplerate = UInt(mattoscalar(matfile, "rez/ops/fs"))
 
     Recording(binarypath, Int16, fsizebytes, nstoredchannels, recordedby,
               recordedon, samplerate)

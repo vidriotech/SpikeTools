@@ -1,6 +1,6 @@
 using HDF5
 
-function naturalsort(x::Array{String, 1})
+function naturalsort(x::Vector{String})
     f = text -> all(isnumeric, text) ? Char(parse(Int, text)) : text
     sorter = key -> join(f(c) for c in collect((m.match for m = eachmatch(r"[0-9]+|[^0-9]+", key))))
     sort(x, by=sorter)

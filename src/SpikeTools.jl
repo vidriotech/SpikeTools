@@ -12,9 +12,10 @@ import .Datasets: Recording, recordingfromspikeglx, recordingfromrezfile, binary
 
 import .Datasets: Trial, trialfromspikeglx, trialfromrezfile, runtimesecs, starttimesecs
 
-import .Datasets: Dataset, datasetfromspikeglx, recordings, trials
+import .Datasets: Dataset, datasetfromjrclust, datasetfromrezfile, datasetfromspikeglx,
+                  probe, recordings, trials
 
-import .Datasets: clusters, clustertimes, nclusters, nspikes, spikeclusters,
+import .Datasets: Annotation, clusters, clustertimes, nclusters, nspikes, spikeclusters,
                   spikecounts, spiketimes
 import .Datasets: JRCLUSTAnnotation, jrclustfrommat
 import .Datasets: TemplateAnnotation, KilosortAnnotation, kilosortfromphy, kilosortfromrezfile,
@@ -28,12 +29,11 @@ export Probe, probefromjrclust, probefromphy, probefromrezfile, probefromspikegl
 export Recording, recordingfromspikeglx, recordingfromrezfile, binarypath, fsizebytes,
        nstoredchannels, recordedby, recordedon, samplerate
 export Trial, trialfromspikeglx, trialfromrezfile, runtimesecs, starttimesecs
-export Dataset, datasetfromspikeglx, recordings, trials
+export Dataset, datasetfromjrclust, datasetfromrezfile, datasetfromspikeglx, probe, recordings, trials
+export Annotation, TemplateAnnotation, JRCLUSTAnnotation, KilosortAnnotation, clusters, clustertimes,
+       nclusters, nspikes, spikeclusters, spikecounts, spiketimes, jrclustfrommat, kilosortfromphy,
+       kilosortfromrezfile, amplitudes, similartemplates, spiketemplates, templates
 export Sorting, sortingfromjrclust, sortingfromrezfile, autoannotation, dataset,
        programused, programversion, runtimesecs, sortedby, sortedon
-export clusters, clustertimes, nclusters, nspikes, spikeclusters, spiketimes
-export JRCLUSTAnnotation, jrclustfrommat
-export TemplateAnnotation, KilosortAnnotation, kilosortfromphy, kilosortfromrezfile,
-       amplitudes, similartemplates, spiketemplates, templates
 
 end # module

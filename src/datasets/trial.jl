@@ -50,7 +50,7 @@ function trialfromspikeglx(filename::String, firstsample::Signed)
 end
 
 function trialfromspikeglx(filename::String, firstsample::Unsigned=0)
-    trialfromspikeglx(filename, Int64(firstsample))
+    trialfromspikeglx(filename, Int(firstsample))
 end
 
 function trialfromspikeglx(pattern::Glob.GlobMatch, prefix::String="")

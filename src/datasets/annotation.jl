@@ -2,32 +2,32 @@ abstract type Annotation end
 abstract type TemplateAnnotation <: Annotation end
 
 struct JRCLUSTAnnotation <: Annotation
-    probe::Probe                        # probe
-    spikeclusters::Array{<:Integer, 1}  # cluster assignment for each spike
-    spiketimes::Array{<:Integer, 1}     # time at which spike was called
+    dataset::Dataset                    # dataset this annotation pertains to
+    spikeclusters::Vector{<:Integer}  # cluster assignment for each spike
+    spiketimes::Vector{<:Integer}     # time at which spike was called
 end
 
 struct KilosortAnnotation <: TemplateAnnotation
-    amplitudes::Array{<:Real, 1}        # template scaling factor
-    probe::Probe                        # probe
+    dataset::Dataset                    # dataset this annotation pertains to
+    amplitudes::Vector{<:Real}        # template scaling factor
     similartemplates::Array{<:Real, 2}  # template similarity score
-    spikeclusters::Array{<:Integer, 1}  # cluster assignment for each spike
-    spiketemplates::Array{<:Integer, 1} # template assignment for each spike
-    spiketimes::Array{<:Integer, 1}     # time at which spike was called
+    spikeclusters::Vector{<:Integer}  # cluster assignment for each spike
+    spiketemplates::Vector{<:Integer} # template assignment for each spike
+    spiketimes::Vector{<:Integer}     # time at which spike was called
     templates::Array{<:Real, 3}         # all templates
 end
 
-function jrclustfrommat(matfile::String, auto::Bool=false; modelname::String="")
-    probe = probefromjrclust(matfile, modelname)
+function jrclustfrommat(matfile::String, auto::Bool=false; modelname::String="", recordedby::String="")
+    dataset = datasetfromjrclust(matfile; modelname=modelname, recordedby=recordedby)
     spikeclusters = Vector{Int64}(readmatshim(matfile, auto ? "S_clu/viClu_auto" : "S_clu/viClu"))
     spiketimes = Vector{UInt64}(readmatshim(matfile, "viTime_spk"))
 
-    JRCLUSTAnnotation(probe, spikeclusters, spiketimes)
+    JRCLUSTAnnotation(dataset, spikeclusters, spiketimes)
 end
 
-function kilosortfromphy(dir::String; modelname::String="")
-    filenames = joinpath.(dir, ["amplitudes.npy", "channel_map.npy", "channel_positions.npy",
-                                "similar_templates.npy", "spike_clusters.npy", "spike_templates.npy",
+function kilosortfromphy(dir::String; modelname::String="", recordedby::String="")
+    filenames = joinpath.(dir, ["amplitudes.npy", "similar_templates.npy",
+                                "spike_clusters.npy", "spike_templates.npy",
                                 "spike_times.npy", "templates.npy", "params.py"])
 
     # directory exists and all files accounted for
@@ -41,13 +41,7 @@ function kilosortfromphy(dir::String; modelname::String="")
         end
     end
 
-    # open up params.py and grab n_channels_dat from it
-    nchannels = open(joinpath(dir, "params.py"), "r") do fh
-        keysvals = Dict{String, String}([split(l, r"\s*=\s*") for l in readlines(fh)]) # . syntax fails here
-        parse(UInt64, keysvals["n_channels_dat"])
-    end
-
-    probe = probefromphy(joinpath(dir, "channel_map.npy"), joinpath(dir, "channel_positions.npy"), modelname, nchannels)
+    dataset = datasetfromphy(dir; modelname=modelname, recordedby=recordedby)
 
     amplitudes = npzread(joinpath(dir, "amplitudes.npy"))[:]
     similartemplates = npzread(joinpath(dir, "similar_templates.npy"))
@@ -66,23 +60,23 @@ function kilosortfromphy(dir::String; modelname::String="")
         error("Spike template assignments inconsistent with saved templates")
     elseif !all(size(similartemplates) .== size(templates, 1))
         error("Template similarity score inconsistent with saved templates")
-    elseif length(channelmap(probe)) ≠ size(templates, 3)
+    elseif length(channelmap(probe(dataset))) ≠ size(templates, 3)
         error("Probe inconsistent with saved templates")
     end
 
-    KilosortAnnotation(amplitudes, probe, similartemplates, spikeclusters,
+    KilosortAnnotation(dataset, amplitudes, similartemplates, spikeclusters,
                        spiketemplates, spiketimes, templates)
 end
 
-function kilosortfromrezfile(rezfile::String; modelname::String="")
-    probe = probefromrezfile(rezfile, modelname)
+function kilosortfromrezfile(rezfile::String; modelname::String="", recordedby::String="")
+    dataset = datasetfromrezfile(rezfile; modelname=modelname, recordedby=recordedby)
 
     st3 = readmatshim(rezfile, "rez/st3", false)
-    spiketimes = Array{UInt64}(st3[:, 1])
-    spiketemplates = Array{UInt32}(st3[:, 2])
+    spiketimes = Vector{UInt64}(st3[:, 1])
+    spiketemplates = Vector{UInt32}(st3[:, 2])
     amplitudes = st3[:, 3]
     if size(st3, 2) > 4
-        spikeclusters = Array{UInt32}(st3[:, 5]) .+ 1
+        spikeclusters = Vector{UInt32}(st3[:, 5]) .+ 1
     else
         spikeclusters = spiketemplates
     end
@@ -110,7 +104,7 @@ function kilosortfromrezfile(rezfile::String; modelname::String="")
         error("Ungathered gpuArray `U` in rez file; gather all gpuArrays and resave")
     end
 
-    Nchan = Int64(mattoscalar(rezfile, "rez/ops/Nchan"))
+    Nchan = Int(mattoscalar(rezfile, "rez/ops/Nchan"))
     (nt0, Nfilt) = size(W)
 
     templates = zeros(Float32, Nchan, nt0, Nfilt)
@@ -119,19 +113,25 @@ function kilosortfromrezfile(rezfile::String; modelname::String="")
     end
     templates = permutedims(templates, [3 2 1]) # now it's nTemplates x nSamples x nChannels
 
-    KilosortAnnotation(amplitudes, probe, similartemplates, spikeclusters,
+    KilosortAnnotation(dataset, amplitudes, similartemplates, spikeclusters,
                        spiketemplates, spiketimes, templates)
 end
 
 function clusters(ann::Annotation, sorted::Bool=true)
     uniqueclusters = unique(spikeclusters(ann))
-    sorted && uniqueclusters == sorted(uniqueclusters)
+    if sorted
+        uniqueclusters = sort(uniqueclusters)
+    end
 
     uniqueclusters
 end
 
 function clustertimes(ann::Annotation, cluster::Integer)
     spiketimes(ann)[spikeclusters(ann) .== cluster]
+end
+
+function dataset(ann::Annotation)
+    ann.dataset
 end
 
 function nclusters(ann::Annotation)
@@ -147,8 +147,7 @@ function spikeclusters(ann::Annotation)
 end
 
 function spikecounts(ann::Annotation)
-    allclusters = clusters(ann)
-    [count(allclusters .== c) for c in allclusters]
+    length.(clustertimes.(Ref(ann), clusters(ann)))
 end
 
 function spiketimes(ann::Annotation)

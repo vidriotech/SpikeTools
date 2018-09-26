@@ -1,7 +1,6 @@
 using Glob
 
 struct Sorting
-    dataset::Dataset           # the dataset on which the sorting was done
     programused::String        # the program used to do the automated sorting
     programversion::String     # version of that program
     runtimesecs::Real          # runtime in seconds for the sorting
@@ -11,44 +10,24 @@ struct Sorting
 end
 
 function sortingfromjrclust(matfile::String; modelname::String="", recordedby::String="", sortedby::String="")
-    filename = readmatshim(matfile, "P/vcFile")
-    if all(filename .== 0)
-        filenames = "$(splitext(mattostring(matfile, "P/csFile_merge"))[1]).meta"
-        prefix = dirname(filenames)
-        prefix = isempty(prefix) ? dirname(matfile) : prefix
-        pattern = Glob.GlobMatch(basename(filenames))
-        dataset = datasetfromspikeglx(pattern, prefix; recordedby=recordedby)
-    else
-        filename = "$(splitext(mattostring(matfile, "P/vcFile"))[1]).meta"
-        dataset = datasetfromspikeglx(filename; recordedby=recordedby)
-    end
-
-    probe = probefromjrclust(matfile, modelname)
-    dataset.probe = probe
-
     programversion = mattostring(matfile, "P/version")
     runtimesecs = mattoscalar(matfile, "runtime_detect") + mattoscalar(matfile, "runtime_sort")
     sortedon = Date(unix2datetime(mtime(matfile)))
     annotation = jrclustfrommat(matfile, true; modelname=modelname)
 
-    Sorting(dataset, "JRCLUST", programversion, runtimesecs, sortedby, sortedon, annotation)
+    Sorting("JRCLUST", programversion, runtimesecs, sortedby, sortedon, annotation)
 end
 
 function sortingfromrezfile(rezfile::String; programversion::String="", runtimesecs::Real=0,
                             modelname::String="", recordedby::String="", sortedby::String="")
-    dataset = datasetfromrezfile(rezfile; modelname=modelname, recordedby=recordedby)
     sortedon = Date(unix2datetime(mtime(rezfile)))
     annotation = kilosortfromrezfile(rezfile; modelname=modelname)
 
-    Sorting(dataset, "KiloSort", programversion, runtimesecs, sortedby, sortedon, annotation)
+    Sorting("KiloSort", programversion, runtimesecs, sortedby, sortedon, annotation)
 end
 
 function autoannotation(sorting::Sorting)
     sorting.autoannotation
-end
-
-function dataset(sorting::Sorting)
-    sorting.dataset
 end
 
 function programused(sorting::Sorting)
