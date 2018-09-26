@@ -1,9 +1,9 @@
 module SpikeMetrics
 
-import ..Annotations: Annotation, clusters, clustertimes, nclusters, nspikes, probe,
-                      spikeclusters, spikecounts, spiketimes
-import ..Annotations: KilosortAnnotation, amplitudes, similartemplates,
-                      spiketemplates, templates
+import ..Datasets: Annotation, clusters, clustertimes, nclusters, nspikes,
+                   spikeclusters, spikecounts, spiketimes
+import ..Datasets: TemplateAnnotation, KilosortAnnotation, amplitudes,
+                   similartemplates, spiketemplates, templates
 
 export isi
 

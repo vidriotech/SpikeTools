@@ -1,6 +1,13 @@
-abstract type PhyAnnotation <: Annotation end
+abstract type Annotation end
+abstract type TemplateAnnotation <: Annotation end
 
-struct KilosortAnnotation <: PhyAnnotation
+struct JRCLUSTAnnotation <: Annotation
+    probe::Probe                        # probe
+    spikeclusters::Array{<:Integer, 1}  # cluster assignment for each spike
+    spiketimes::Array{<:Integer, 1}     # time at which spike was called
+end
+
+struct KilosortAnnotation <: TemplateAnnotation
     amplitudes::Array{<:Real, 1}        # template scaling factor
     probe::Probe                        # probe
     similartemplates::Array{<:Real, 2}  # template similarity score
@@ -53,18 +60,50 @@ function kilosortfromphy(dir::String)
                        spiketemplates, spiketimes, templates)
 end
 
-function amplitudes(ann::KilosortAnnotation)
+function clusters(ann::Annotation, sorted::Bool=true)
+    uniqueclusters = unique(spikeclusters(ann))
+    sorted && uniqueclusters == sorted(uniqueclusters)
+
+    uniqueclusters
+end
+
+function clustertimes(ann::Annotation, cluster::Integer)
+    spiketimes(ann)[spikeclusters(ann) .== cluster]
+end
+
+function nclusters(ann::Annotation)
+    length(clusters(ann, false))
+end
+
+function nspikes(ann::Annotation)
+    length(spiketimes(ann))
+end
+
+function spikeclusters(ann::Annotation)
+    ann.spikeclusters
+end
+
+function spikecounts(ann::Annotation)
+    allclusters = clusters(ann)
+    [count(allclusters .== c) for c in allclusters]
+end
+
+function spiketimes(ann::Annotation)
+    ann.spiketimes
+end
+
+function amplitudes(ann::TemplateAnnotation)
     ann.amplitudes
 end
 
-function similartemplates(ann::KilosortAnnotation)
+function similartemplates(ann::TemplateAnnotation)
     ann.similartemplates
 end
 
-function spiketemplates(ann::KilosortAnnotation)
+function spiketemplates(ann::TemplateAnnotation)
     ann.spiketemplates
 end
 
-function templates(ann::KilosortAnnotation)
+function templates(ann::TemplateAnnotation)
     ann.templates
 end

@@ -1,10 +1,8 @@
 module SpikeTools
 
-export Annotations
 export Datasets
 
 include("datasets.jl")
-include("annotations.jl")
 
 import .Datasets: Probe, probefromjrclust, probefromphy, probefromrezfile, probefromspikeglx,
                   channelmap, channelpositions, modelname, nchannels
@@ -15,10 +13,10 @@ import .Datasets: Dataset, datasetfromspikeglx, recordings, trials
 import .Datasets: Sorting, sortingfromjrclust, sortingfromrezfile, dataset, programused,
                   programversion, runtimesecs, sortedby, sortedon
 
-import .Annotations: clusters, clustertimes, nclusters, nspikes, spikeclusters,
-                     spikecounts, spiketimes
-import .Annotations: KilosortAnnotation, kilosortfromphy, amplitudes, similartemplates,
-                     spiketemplates, templates
+import .Datasets: clusters, clustertimes, nclusters, nspikes, spikeclusters,
+                  spikecounts, spiketimes
+import .Datasets: TemplateAnnotation, KilosortAnnotation, kilosortfromphy, amplitudes,
+                  similartemplates, spiketemplates, templates
 
 export Probe, probefromjrclust, probefromphy, probefromrezfile, probefromspikeglx,
        channelmap, channelpositions, modelname, nchannels

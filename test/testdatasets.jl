@@ -132,6 +132,7 @@ end
 @testset "Create multiple datasets from SpikeGLX" begin
     metafiles = glob"anm365938_g0_t*.nidq.meta"
     dataset = datasetfromspikeglx(metafiles, joinpath(ENV["TESTBASE"], "datasets", "fromspikeglx"); modelname="Neuropixels Phase 3A", recordedby="Radagast")
+
     @test modelname(dataset.probe) == "Neuropixels Phase 3A"
     recs = recordings(dataset)
     t = rand(1:length(recs))
@@ -149,6 +150,20 @@ end
     mask = runtimesecs.(trs) .≈ 7.90008
     @test sum(mask) == 44 # these are the larger files in the recordings test
     @test all(runtimesecs.(trs)[.!mask] .≈ 7.90004)
+end
+
+@testset "Import KiloSort annotation from .npy files" begin
+    kilosortoutputdir = joinpath(ENV["TESTBASE"], "datasets", "fromphy")
+    ksannotation = kilosortfromphy(kilosortoutputdir)
+    @test nclusters(ksannotation) == 358
+    @test nspikes(ksannotation) == 9014015
+    @test length(channelmap(ksannotation.probe)) == 374
+    @test size(channelpositions(ksannotation.probe)) == (374, 2)
+    @test minimum(amplitudes(ksannotation)) ≈ 12.003653526306152
+    @test maximum(amplitudes(ksannotation)) ≈ 106.51536560058594
+    @test minimum(similartemplates(ksannotation)[CartesianIndex.(1:358, 1:358)]) ≈ 0.9828815f0
+    @test maximum(similartemplates(ksannotation)[CartesianIndex.(1:358, 1:358)]) ≈ 0.98868686f0
+    @test spiketemplates(ksannotation)[10191] == 24
 end
 
 @testset "Create a sorting from JRCLUST" begin
