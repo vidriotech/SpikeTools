@@ -3,6 +3,7 @@ module SpikeTools
 export Datasets
 
 include("datasets.jl")
+include("spikemetrics.jl")
 
 import .Datasets: Probe, probefromjrclust, probefromphy, probefromrezfile, probefromspikeglx,
                   channelmap, channelpositions, modelname, nchannels
@@ -24,6 +25,8 @@ import .Datasets: TemplateAnnotation, KilosortAnnotation, kilosortfromphy, kilos
 import .Datasets: Sorting, sortingfromjrclust, sortingfromrezfile, autoannotation, dataset,
                   programused, programversion, runtimesecs, sortedby, sortedon
 
+import .SpikeMetrics: isifraction
+
 export Probe, probefromjrclust, probefromphy, probefromrezfile, probefromspikeglx,
        channelmap, channelpositions, modelname, nchannels
 export Recording, recordingfromspikeglx, recordingfromrezfile, binarypath, fsizebytes,
@@ -35,5 +38,7 @@ export Annotation, TemplateAnnotation, JRCLUSTAnnotation, KilosortAnnotation, cl
        kilosortfromrezfile, amplitudes, similartemplates, spiketemplates, templates
 export Sorting, sortingfromjrclust, sortingfromrezfile, autoannotation, dataset,
        programused, programversion, runtimesecs, sortedby, sortedon
+
+export isifraction
 
 end # module
