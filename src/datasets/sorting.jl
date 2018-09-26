@@ -19,7 +19,7 @@ function sortingfromjrclust(matfile::String; modelname::String="", recordedby::S
         pattern = Glob.GlobMatch(basename(filenames))
         dataset = datasetfromspikeglx(pattern, prefix; recordedby=recordedby)
     else
-        filename = "$(mattostring(filename, "P/vcFile")[1]).meta"
+        filename = "$(splitext(mattostring(matfile, "P/vcFile"))[1]).meta"
         dataset = datasetfromspikeglx(filename; recordedby=recordedby)
     end
 

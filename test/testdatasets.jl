@@ -214,6 +214,21 @@ end
     @test spiketemplates(ksannotation)[10191] == 81
 end
 
+@testset "Import annotation from KiloSort rez.mat file" begin
+    rezfile = joinpath(ENV["TESTBASE"], "datasets", "fromrez", "eMouse-rez.mat")
+    ksannotation = kilosortfromrezfile(rezfile; modelname="eMouse")
+
+    @test nclusters(ksannotation) == 31
+    @test nspikes(ksannotation) == 168879
+    @test length(channelmap(ksannotation.probe)) == 32
+    @test size(channelpositions(ksannotation.probe)) == (32, 2)
+    @test minimum(amplitudes(ksannotation)) ≈ 10.027755737304688
+    @test maximum(amplitudes(ksannotation)) ≈ 1.145809936523438e+02
+    @test minimum(similartemplates(ksannotation)[CartesianIndex.(1:64, 1:64)]) == 0
+    @test maximum(similartemplates(ksannotation)[CartesianIndex.(1:64, 1:64)]) ≈ 1.0000008 # !!
+    @test spiketemplates(ksannotation)[10191] == 6
+end
+
 @testset "Import annotation from KiloSort2 rez.mat file" begin
     rezfile = joinpath(ENV["TESTBASE"], "datasets", "fromrez", "ks2-rez.mat")
     ksannotation = kilosortfromrezfile(rezfile; modelname="Neuropixels Phase 3A")
@@ -257,7 +272,37 @@ end
     @test nchannels(jrcannotation.probe) == 256
     @test spikeclusters(jrcannotation)[10191] == 186
 end
-#
+
+@testset "Import a sorting from KiloSort rez.mat" begin
+    rezfile = joinpath(ENV["TESTBASE"], "datasets", "fromrez", "eMouse-rez.mat")
+    sorting = sortingfromrezfile(rezfile, programversion="0fbe8eb", runtimesecs=0,
+                                 modelname="eMouse", recordedby="Shagrat", sortedby="Gorbag")
+    chanmap = [8; 10; 12; 14; 16; 18; 20; 22; 24; 26; 28; 30; 32; 7; 9; 11; 13; 15; 17; 19; 21; 23; 25; 27; 29; 31; 1; 2; 3; 4; 5; 6]
+    xc = [20; 0; 0; 20; 0; 20; 0; 20; 0; 20; 0; 20; 0; 20; 0; 20; 20; 0; 20; 0; 20; 0; 20; 0; 20; 0; 20; 0; 20; 0; 20; 0]
+    yc = [140; 160; 180; 180; 200; 200; 220; 220; 240; 240; 260; 260; 280; 280; 300; 300; 320; 340; 340; 360; 360; 380; 380; 400; 400; 420; 420; 440; 440; 460; 460; 480]
+    chanpos = [xc yc]
+
+    @test channelmap(dataset(sorting).probe) == chanmap
+    @test channelpositions(dataset(sorting).probe) == chanpos
+    @test modelname(dataset(sorting).probe) == "eMouse"
+    @test nchannels(dataset(sorting).probe) == 34
+    @test programused(sorting) == "KiloSort"
+    @test programversion(sorting) == "0fbe8eb"
+    @test runtimesecs(sorting) ≈ 0
+    @test sortedby(sorting) == "Gorbag"
+    @test sortedon(sorting) == Date("2018-09-26")
+
+    ksannotation = autoannotation(sorting)
+    @test nclusters(ksannotation) == 31
+    @test nspikes(ksannotation) == 168879
+    @test length(channelmap(ksannotation.probe)) == 32
+    @test size(channelpositions(ksannotation.probe)) == (32, 2)
+    @test minimum(amplitudes(ksannotation)) ≈ 10.027755737304688
+    @test maximum(amplitudes(ksannotation)) ≈ 1.145809936523438e+02
+    @test minimum(similartemplates(ksannotation)[CartesianIndex.(1:64, 1:64)]) == 0
+    @test maximum(similartemplates(ksannotation)[CartesianIndex.(1:64, 1:64)]) ≈ 1.0000008 # !!
+    @test spiketemplates(ksannotation)[10191] == 6
+end
 @testset "Import a sorting from KiloSort2 rez.mat" begin
     rezfile = joinpath(ENV["TESTBASE"], "datasets", "fromrez", "ks2-rez.mat")
     sorting = sortingfromrezfile(rezfile, programversion="77bd485", runtimesecs=0,
