@@ -11,11 +11,13 @@ export Dataset, datasetfromspikeglx, recordings, trials
 # generic annotation
 export Annotation, clusters, clustertimes, nclusters, nspikes, spikeclusters,
        spikecounts, spiketimes
+# jrclust annotation
+export JRCLUSTAnnotation, jrclustfrommat
 # kilosort/template annotation
-export TemplateAnnotation, KilosortAnnotation, kilosortfromphy, amplitudes,
-       similartemplates, spiketemplates, templates
-export Sorting, sortingfromjrclust, sortingfromrezfile, dataset, programused,
-       programversion, runtimesecs, sortedby, sortedon
+export TemplateAnnotation, KilosortAnnotation, kilosortfromphy, kilosortfromrezfile,
+       amplitudes, similartemplates, spiketemplates, templates
+export Sorting, sortingfromjrclust, sortingfromrezfile, autoannotation, dataset,
+       programused, programversion, runtimesecs, sortedby, sortedon
 
 include("datasets/utils.jl")
 include("datasets/probe.jl")

@@ -43,6 +43,12 @@ git-tree-sha1 = "ff2595695fc4f14427358ce2593f867085c45dcb"
 uuid = "34da2185-b29b-5c13-b0c7-acf172513d20"
 version = "1.2.0"
 
+[[Coverage]]
+deps = ["Compat", "HTTP", "JSON", "MbedTLS"]
+git-tree-sha1 = "cf60c0f9832b897d22a65be674148a7f37b40f6a"
+uuid = "a2441757-f6aa-5fb2-8edb-039e3f45d037"
+version = "0.6.0"
+
 [[Dates]]
 deps = ["Printf"]
 uuid = "ade2ca70-3891-5945-98fb-dc099432e06a"
@@ -67,6 +73,12 @@ git-tree-sha1 = "8c3bcdb44db436cd20106e2381e1c1ac96aa0ee3"
 uuid = "f67ccb44-e63f-5c2f-98bd-6dc0ccc4ba2f"
 version = "0.10.2"
 
+[[HTTP]]
+deps = ["Base64", "Dates", "Distributed", "IniFile", "MbedTLS", "Sockets", "Test"]
+git-tree-sha1 = "16499da36240bf80df9a7e9b0f228710be1fe37c"
+uuid = "cd3eb016-35fb-5094-929b-558a96fad6f3"
+version = "0.7.0"
+
 [[HTTPClient]]
 deps = ["Compat", "LibCURL"]
 git-tree-sha1 = "161d5776ae8e585ac0b8c20fb81f17ab755b3671"
@@ -78,6 +90,12 @@ deps = ["BinDeps", "InteractiveUtils", "JSON", "Libdl", "Test", "Unicode"]
 git-tree-sha1 = "5582ec74f735cf8d12e562a2e65c47f34063bd51"
 uuid = "d9be37ee-ecc9-5288-90f1-b9ca67657a75"
 version = "0.7.0"
+
+[[IniFile]]
+deps = ["Test"]
+git-tree-sha1 = "098e4d2c533924c921f9f9847274f2ad89e018b8"
+uuid = "83e8ac13-25f8-5344-8a64-a9f2b223428f"
+version = "0.5.0"
 
 [[InteractiveUtils]]
 deps = ["LinearAlgebra", "Markdown"]
@@ -130,6 +148,12 @@ version = "0.4.0"
 deps = ["Base64"]
 uuid = "d6f4376e-aef5-505a-96c1-9c027394607a"
 
+[[MbedTLS]]
+deps = ["BinaryProvider", "Libdl", "Pkg", "Random", "Sockets", "Test"]
+git-tree-sha1 = "3775d205b09b624aa06d39012a8920ba99cb3b8b"
+uuid = "739be429-bea8-5141-9913-cc70e7f3736d"
+version = "0.6.3"
+
 [[Mmap]]
 uuid = "a63ad114-7e13-5084-954f-fe012c677804"
 
@@ -141,9 +165,9 @@ version = "0.3.0"
 
 [[OrderedCollections]]
 deps = ["Pkg", "Random", "Serialization", "Test"]
-git-tree-sha1 = "41da1edba028376b58520ca01d9a41e29f855d55"
+git-tree-sha1 = "85619a3f3e17bb4761fe1b1fd47f0e979f964d5b"
 uuid = "bac558e1-5e72-5ebc-8fee-abe8a469f55d"
-version = "1.0.1"
+version = "1.0.2"
 
 [[Parameters]]
 deps = ["Markdown", "OrderedCollections", "Pkg", "REPL", "Test"]

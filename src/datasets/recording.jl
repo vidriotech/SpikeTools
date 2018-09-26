@@ -7,7 +7,7 @@ mutable struct Recording
     fsizebytes::UInt64      # size of the file, in bytes
     nstoredchannels::UInt64 # number of stored channels in file
     recordedby::String      # who recorded this data set
-    recordedon::DateTime    # date and time on which this file BEGAN recording
+    recordedon::Date        # date on which this file was created
     samplerate::UInt64      # sample rate of the recording, in Hz
 end
 
@@ -30,7 +30,7 @@ function readspikeglxmeta(filename::String)
     vals = Dict(["binarypath" => metadata["fileName"],
                  "fsizebytes" => parse(UInt64, metadata["fileSizeBytes"]),
                  "nstoredchannels" => parse(UInt64, metadata["nSavedChans"]),
-                 "recordedon" => DateTime(metadata["fileCreateTime"])])
+                 "recordedon" => Date(DateTime(metadata["fileCreateTime"]))])
 
     # distinguish here between NI-DAQ and IMEC probes
     if metadata["typeThis"] == "imec"
@@ -46,7 +46,7 @@ function recordingfromrezfile(matfile::String; recordedby::String="")
     binarypath = mattostring(matfile, "rez/ops/fbinary")
     fsizebytes = filesize(binarypath)
     nstoredchannels = UInt64(mattoscalar(matfile, "rez/ops/NchanTOT"))
-    recordedon = unix2datetime(mtime(binarypath))
+    recordedon = Date(unix2datetime(mtime(binarypath)))
     samplerate = UInt64(mattoscalar(matfile, "rez/ops/fs"))
 
     Recording(binarypath, Int16, fsizebytes, nstoredchannels, recordedby,

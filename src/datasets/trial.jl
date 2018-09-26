@@ -13,9 +13,17 @@ struct Trial
     end
 end
 
-function trialfromrezfile(matfile::String, samplerate::Integer)
-    tstart = mattoscalar(matfile, "rez/ops/tstart")
-    tend = mattoscalar(matfile, "rez/ops/tend")
+function trialfromrezfile(rezfile::String)
+    samplerate = mattoscalar(rezfile, "rez/ops/fs")
+    if matfieldexists(rezfile, "rez/ops", "tstart")
+        tstart = mattoscalar(rezfile, "rez/ops/tstart")
+        tend = mattoscalar(rezfile, "rez/ops/tend")
+    else # make a guess based on the file size
+        nchannels = mattoscalar(rezfile, "rez/ops/NchanTOT")
+        tstart = 0
+        tend = filesize(mattostring(rezfile, "rez/ops/fbinary"))/(2nchannels)
+    end
+
     Trial(tstart/samplerate, tend/samplerate)
 end
 

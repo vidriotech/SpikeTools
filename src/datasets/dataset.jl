@@ -14,10 +14,10 @@ mutable struct Dataset
     end
 end
 
-function datasetfromrezfile(matfile::String; modelname::String="", recordedby::String="")
-    probe = probefromrezfile(matfile, modelname)
-    recording = recordingfromrezfile(matfile; recordedby=recordedby)
-    trial = trialfromrezfile(matfile, samplerate(recording))
+function datasetfromrezfile(rezfile::String; modelname::String="", recordedby::String="")
+    probe = probefromrezfile(rezfile, modelname)
+    recording = recordingfromrezfile(rezfile; recordedby=recordedby)
+    trial = trialfromrezfile(rezfile)
     Dataset(probe, recording, trial)
 end
 

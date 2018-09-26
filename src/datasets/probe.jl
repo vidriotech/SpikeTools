@@ -15,12 +15,12 @@ struct Probe
     end
 end
 
-function probefromjrclust(matfile::String, modelname::String="", nchannels::Integer=0)
+function probefromjrclust(matfile::String, modelname::String="")
     channelmap = Array{UInt64}(readmatshim(matfile, "P/viSite2Chan"))
     channelpositions = readmatshim(matfile, "P/mrSiteXY", false)
 
     # by default, assume nchannels is largest channel in channel map
-    nchannels = nchannels > 0 ? nchannels : maximum(channelmap)
+    nchannels = UInt64(mattoscalar(matfile, "P/nChans"))
     Probe(channelmap, channelpositions, modelname, nchannels)
 end
 
@@ -34,11 +34,17 @@ function probefromphy(chanmapfile::String, chanposfile::String, modelname::Strin
     Probe(channelmap, channelpositions, modelname, nchannels)
 end
 
-function probefromrezfile(matfile::String, modelname::String="")
-    channelmap = Array{UInt64}(readmatshim(matfile, "rez/ops/chanMap"))
-    channelpositions = [readmatshim(matfile, "rez/xcoords") readmatshim(matfile, "rez/ycoords")]
-    nchannels = UInt64(mattoscalar(matfile, "rez/ops/NchanTOT"))
-    connected = indexin(1:nchannels, channelmap) .≠ nothing
+function probefromrezfile(rezfile::String, modelname::String="")
+    channelmap = Array{UInt64}(readmatshim(rezfile, "rez/ops/chanMap"))
+    channelpositions = [readmatshim(rezfile, "rez/xcoords") readmatshim(rezfile, "rez/ycoords")]
+    nchannels = UInt64(mattoscalar(rezfile, "rez/ops/NchanTOT"))
+
+    if matfieldexists(rezfile, "rez", "connected") # KiloSort 1
+        connected = Vector{Bool}(readmatshim(rezfile, "rez/connected"))
+        channelmap = channelmap[connected]
+        channelpositions = channelpositions[connected, :]
+    end
+
     Probe(channelmap, channelpositions, modelname, nchannels)
 end
 

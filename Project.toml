@@ -12,8 +12,9 @@ MAT = "23992714-dd62-5051-b70f-ba57cb901cac"
 NPZ = "15e1cf62-19b3-5cfa-8e77-841668bca605"
 
 [extras]
+Coverage = "a2441757-f6aa-5fb2-8edb-039e3f45d037"
 DotEnv = "4dc1fcf4-5e3b-5448-94ab-0c38ec0385c1"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 
 [targets]
-test = ["Test", "DotEnv"]
+test = ["Test", "DotEnv", "Coverage"]

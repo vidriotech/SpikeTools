@@ -17,10 +17,18 @@ struct KilosortAnnotation <: TemplateAnnotation
     templates::Array{<:Real, 3}         # all templates
 end
 
-function kilosortfromphy(dir::String)
+function jrclustfrommat(matfile::String, auto::Bool=false; modelname::String="")
+    probe = probefromjrclust(matfile, modelname)
+    spikeclusters = Vector{Int64}(readmatshim(matfile, auto ? "S_clu/viClu_auto" : "S_clu/viClu"))
+    spiketimes = Vector{UInt64}(readmatshim(matfile, "viTime_spk"))
+
+    JRCLUSTAnnotation(probe, spikeclusters, spiketimes)
+end
+
+function kilosortfromphy(dir::String; modelname::String="")
     filenames = joinpath.(dir, ["amplitudes.npy", "channel_map.npy", "channel_positions.npy",
                                 "similar_templates.npy", "spike_clusters.npy", "spike_templates.npy",
-                                "spike_times.npy", "templates.npy"])
+                                "spike_times.npy", "templates.npy", "params.py"])
 
     # directory exists and all files accounted for
     if !isdir(dir)
@@ -33,7 +41,13 @@ function kilosortfromphy(dir::String)
         end
     end
 
-    probe = probefromphy(joinpath(dir, "channel_map.npy"), joinpath(dir, "channel_positions.npy"))
+    # open up params.py and grab n_channels_dat from it
+    nchannels = open(joinpath(dir, "params.py"), "r") do fh
+        keysvals = Dict{String, String}([split(l, r"\s*=\s*") for l in readlines(fh)]) # . syntax fails here
+        parse(UInt64, keysvals["n_channels_dat"])
+    end
+
+    probe = probefromphy(joinpath(dir, "channel_map.npy"), joinpath(dir, "channel_positions.npy"), modelname, nchannels)
 
     amplitudes = npzread(joinpath(dir, "amplitudes.npy"))[:]
     similartemplates = npzread(joinpath(dir, "similar_templates.npy"))
@@ -55,6 +69,55 @@ function kilosortfromphy(dir::String)
     elseif length(channelmap(probe)) ≠ size(templates, 3)
         error("Probe inconsistent with saved templates")
     end
+
+    KilosortAnnotation(amplitudes, probe, similartemplates, spikeclusters,
+                       spiketemplates, spiketimes, templates)
+end
+
+function kilosortfromrezfile(rezfile::String; modelname::String="")
+    probe = probefromrezfile(rezfile, modelname)
+
+    st3 = readmatshim(rezfile, "rez/st3", false)
+    spiketimes = Array{UInt64}(st3[:, 1])
+    spiketemplates = Array{UInt32}(st3[:, 2])
+    amplitudes = st3[:, 3]
+    if size(st3, 2) > 4
+        spikeclusters = Array{UInt32}(st3[:, 5]) .+ 1
+    else
+        spikeclusters = spiketemplates
+    end
+
+    ntemplates = length(unique(spiketemplates))
+
+    if matfieldexists(rezfile, "rez", "simScore")
+        similartemplates = readmatshim(rezfile, "rez/simScore", false)
+    else
+        # TODO: compute this here
+        similartemplates = NaN .* ones(ntemplates, ntemplates)
+    end
+
+    if matfieldexists(rezfile, "rez", "Wphy")
+        W = readmatshim(rezfile, "rez/Wphy", false)
+    else
+        W = readmatshim(rezfile, "rez/W", false)
+    end
+    if ndims(W) < 3 # ungathered gpuArray
+        error("Ungathered gpuArray `W` or `Wphy` in rez file; gather all gpuArrays and resave")
+    end
+
+    U = readmatshim(rezfile, "rez/U", false)
+    if ndims(U) < 3 # ungathered gpuArray
+        error("Ungathered gpuArray `U` in rez file; gather all gpuArrays and resave")
+    end
+
+    Nchan = Int64(mattoscalar(rezfile, "rez/ops/Nchan"))
+    (nt0, Nfilt) = size(W)
+
+    templates = zeros(Float32, Nchan, nt0, Nfilt)
+    for iNN = 1:size(templates, 3)
+        templates[:, :, iNN] = U[:, iNN, :] * transpose(W[:, iNN, :])
+    end
+    templates = permutedims(templates, [3 2 1]) # now it's nTemplates x nSamples x nChannels
 
     KilosortAnnotation(amplitudes, probe, similartemplates, spikeclusters,
                        spiketemplates, spiketimes, templates)

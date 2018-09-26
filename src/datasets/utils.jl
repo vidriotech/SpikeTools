@@ -27,6 +27,10 @@ function readmatshim(filename::String, attr::String, flatten::Bool=true) # neces
     data = flatten ? h5read(filename, attr)[:] : h5read(filename, attr)
 end
 
+function matfieldexists(matfile::String, dataset::String, field::String)
+    field in h5readattr(matfile, dataset)["MATLAB_fields"]
+end
+
 function mattostring(matfile::String, attr::String)
     join(Char.(readmatshim(matfile, attr)), "")
 end
