@@ -1,5 +1,5 @@
 @testset "Import KiloSort annotations from .npy files" begin
-    ksannotation = loadkilosort(joinpath(ENV["TESTBASE"], "annotations", "kilosort-phy"))
+    ksannotation = kilosortfromphy(joinpath(ENV["TESTBASE"], "annotations", "kilosort-phy"))
 
     @test nclusters(ksannotation) == 358
     @test nspikes(ksannotation) == 9014015

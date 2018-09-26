@@ -7,7 +7,7 @@ import ..Datasets: Probe, probefromphy, channelmap
 export Annotation, clusters, clustertimes, nclusters, nspikes, probe,
        spikeclusters, spikecounts, spiketimes
 # kilosort annotation
-export KilosortAnnotation, loadkilosort, amplitudes, similartemplates,
+export KilosortAnnotation, kilosortfromphy, amplitudes, similartemplates,
        spiketemplates, templates
 
 include("annotations/generic.jl")

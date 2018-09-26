@@ -17,7 +17,7 @@ import .Datasets: Sorting, sortingfromjrclust, sortingfromrezfile, dataset, prog
 
 import .Annotations: clusters, clustertimes, nclusters, nspikes, spikeclusters,
                      spikecounts, spiketimes
-import .Annotations: KilosortAnnotation, loadkilosort, amplitudes, similartemplates,
+import .Annotations: KilosortAnnotation, kilosortfromphy, amplitudes, similartemplates,
                      spiketemplates, templates
 
 export Probe, probefromjrclust, probefromphy, probefromrezfile, probefromspikeglx,
@@ -30,7 +30,7 @@ export Sorting, sortingfromjrclust, sortingfromrezfile, dataset, programused,
        programversion, runtimesecs, sortedby, sortedon
 
 export clusters, clustertimes, nclusters, nspikes, spikeclusters, spiketimes
-export KilosortAnnotation, loadkilosort, amplitudes, similartemplates,
+export KilosortAnnotation, kilosortfromphy, amplitudes, similartemplates,
        spiketemplates, templates
 
 end # module

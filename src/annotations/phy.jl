@@ -10,7 +10,7 @@ struct KilosortAnnotation <: PhyAnnotation
     templates::Array{<:Real, 3}         # all templates
 end
 
-function loadkilosort(dir::String)
+function kilosortfromphy(dir::String)
     filenames = joinpath.(dir, ["amplitudes.npy", "channel_map.npy", "channel_positions.npy",
                                 "similar_templates.npy", "spike_clusters.npy", "spike_templates.npy",
                                 "spike_times.npy", "templates.npy"])
