@@ -21,7 +21,7 @@ function readmatshim(filename::String, attr::String, flatten::Bool=true) # neces
 
     # MAT files less than 7.3 don't use HDF5
     if matfilever < 7.3
-        error("not supported")
+        error("This version not supported; convert to v7.3 and try again")
     end
 
     data = flatten ? h5read(filename, attr)[:] : h5read(filename, attr)
